@@ -35,6 +35,9 @@ setup(
     install_requires=[
         "pyahocorasick",
         "progress",
+        "jinja2==3.0.0", # > 3.1 will not work
+        "folium",
+        "pyecharts",
     ],
 
     package_data={

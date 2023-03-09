@@ -4,6 +4,10 @@ from . import _fill_adcode
 from collections import defaultdict
 import itertools
 import operator
+import folium
+from folium.plugins import HeatMap
+from pyecharts.charts import Geo
+from pyecharts import options as opts
 
 
 def ad2addr(part_adcode):
@@ -32,14 +36,14 @@ def _geo_update(geo, adcodes):
     return rest_adcodes
 
 
-def draw_locations(adcodes, file_path):
+def draw_locations(adcodes, file_path, 
+                   tiles= 'https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7', 
+                   attr = 'amap'):
     """
     基于folium生成地域分布的热力图的html文件.
     :param adcodes: 地址集
     :param file_path: 生成的html文件的路径.
     """
-    import folium
-    from folium.plugins import HeatMap
     adcodes = filter(None, adcodes)
 
     # 注意判断key是否存在
@@ -50,7 +54,8 @@ def draw_locations(adcodes, file_path):
             continue
         heatData.append([float(attr_info.latitude), float(attr_info.longitude), 1])
     # 绘制Map，开始缩放程度是5倍
-    map_osm = folium.Map(location=[35, 110], zoom_start=5)
+    map_osm = folium.Map(location=[35, 110], zoom_start=5, 
+                         tiles = tiles, attr=attr)
     # 将热力图添加到前面建立的map里
     HeatMap(heatData).add_to(map_osm)
     # 保存为html文件
@@ -66,9 +71,7 @@ def echarts_draw(adcodes, file_path, title="地域分布图"
     :param title: 图表的标题
     :param subtitle: 图表的子标题
     """
-    from pyecharts import Geo
-
-
+    
     # 过滤 None
     # 过滤掉缺乏经纬度数据的地点
     coordinates = {}
@@ -80,15 +83,17 @@ def echarts_draw(adcodes, file_path, title="地域分布图"
         counter[adcode] = counter[adcode] + 1
         coordinates[adcode] = (float(addr.longitude), float(addr.latitude))
 
-    geo = Geo(title, subtitle, title_color="#fff",
-              title_pos="center", width=1200,
-              height=600, background_color='#404a59')
+    #geo = Geo(title, subtitle, fg_color="#fff",
+    #          title_pos="center", width=1200,
+    #          height=600, bg_color='#404a59')
+    geo = Geo(init_opts=opts.InitOpts(width="1200px", height="600px", bg_color="#fff",page_title=title))
     geo._coordinates = coordinates
 
     attr, value = geo.cast(counter)
     geo.add("", attr, value, type="heatmap", is_visualmap=True,
             visual_text_color='#fff',
             is_piecewise=True, visual_split_number=10)
+
     geo.render(file_path)
 
 
@@ -119,10 +124,10 @@ def echarts_cate_draw(adcodes, labels, file_path, title="地域分布图", subti
         coordinates[adcode] = (float(addr.longitude), float(addr.latitude))
         tuples.append((adcode, label))
 
-    from pyecharts import Geo
-    geo = Geo(title, subtitle, title_color="#000000",
-              title_pos="center", width=1200,
-              height=600, background_color='#fff')
+    #geo = Geo(title, subtitle, title_color="#000000",
+    #          title_pos="center", width=1200,
+    #          height=600, background_color='#fff')
+    geo = Geo(init_opts=opts.InitOpts(width="1200px", height="600px", bg_color="#fff",page_title=title))
     geo._coordinates = coordinates
 
     for label, sub_tuples in itertools.groupby(tuples, operator.itemgetter(1)):
