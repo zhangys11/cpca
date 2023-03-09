@@ -1,5 +1,5 @@
-import ahocorasick
 import re
+import ahocorasick
 
 
 class MatchInfo:

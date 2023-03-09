@@ -1,3 +1,3 @@
-include LICENSE
+﻿include LICENSE
 exclude .gitignore
 

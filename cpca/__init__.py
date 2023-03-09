@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-# __init__.py
-
-
 from .structures import AddrMap, Pca
 from .structures import P, C, A
 from .matcher import Matcher
