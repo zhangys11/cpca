@@ -37,7 +37,7 @@ setup(
         "progress",
         "jinja2==3.0.0", # > 3.1 will not work
         "folium",
-        "pyecharts",
+        "pyecharts>=1.9.0",
     ],
 
     package_data={
